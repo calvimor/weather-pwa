@@ -1,4 +1,5 @@
-var cacheName = "weatherPWA-v1";
+var dataCacheName = "weatherData-v2";
+var cacheName = "weatherPWA-v2";
 var filesToCache = [
     '/',
     '/index.html',
@@ -8,7 +9,6 @@ var filesToCache = [
     '/images/clear.png',
     '/images/cloudy-scattered-showers.png',
     '/images/cloudy.png',
-    '/images/fog.png',
     '/images/ic_add_white_24px.svg',
     '/images/ic_refresh_white_24px.svg',
     '/images/partly-cloudy.png',
@@ -19,6 +19,9 @@ var filesToCache = [
     '/images/thunderstorm.png',
     '/images/wind.png'
 ];
+
+var weatherAPIUrlBase = 'https://publicdata-weather.firebaseio.com/';
+
 self.addEventListener('install', function (e) {
     console.log('[ServiceWorker] install');
     e.waitUntil(
@@ -34,7 +37,7 @@ self.addEventListener('activate', function (e) {
     e.waitUntil(
         caches.keys().then( function (keyList) {
             return Promise.all(keyList.map( function (key) {
-                if ( key !== cacheName ) {
+                if ( key !== cacheName && key !== dataCacheName ) {
                     console.log('[ServiceWorker] Removing old cache', key);
                     return caches.delete(key);
                 }
@@ -44,10 +47,24 @@ self.addEventListener('activate', function (e) {
 });
 
 self.addEventListener('fetch', function (e) {
-    console.log('[ServiceWorker] Fetch', e.request.url);
-    e.respondWith(
+    console.log('[ServiceWorker] Fetch', e.request.url, weatherAPIUrlBase);
+    if ( e.request.url.startsWith(weatherAPIUrlBase) ) {
+      console.log('Fetching api weather ', weatherAPIUrlBase);
+      e.respondWith(
+        fetch( e.request ).then( function (response) {
+          return caches.open(dataCacheName).then( function ( cache ) {
+            cache.put(e.request.url, response.clone());
+            console.log('[ServiceWorker] Fetched & Cached Data');
+            return response;
+          });
+        })
+      );
+    }
+    else {
+      e.respondWith(
         caches.match(e.request).then( function ( response ) {
             return response || fetch( e.request );
         })
-    );
+      );
+    }
 });

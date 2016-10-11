@@ -124,6 +124,16 @@
       app.container.appendChild(card);
       app.visibleCards[data.key] = card;
     }
+    
+    // Verify data is newer than what we already have, if not, bail.
+    
+    var dataElem = card.querySelector('.date');
+    if ( dataElem.getAttribute('data-dt') >= data.currently.time) {
+      return;
+    }
+    
+    dataElem.setAttribute('data-dt', data.currently.time);
+    dataElem.textContent = new Date( data.currently.time * 1000 );
     card.querySelector('.description').textContent = data.currently.summary;
     card.querySelector('.date').textContent =
       new Date(data.currently.time * 1000);
@@ -173,7 +183,26 @@
   // Gets a forecast for a specific city and update the card with the data
   app.getForecast = function(key, label) {
     var url = weatherAPIUrlBase + key + '.json';
+    
+    if ( 'caches' in window ) {
+      caches.match( url ).then( function ( response ) {
+        if ( response ) {
+          response.json().then( function ( json ) {
+            // Only update if th XHR is still pending, otherwise the XHR
+            // has already returned and provided the latest data
+            if( app.hasRequestPending ) {
+              console.log('Updated from cache');
+              json.key = key;
+              json.label = label;
+              app.updateForecastCard(json);  
+            }
+          });
+        }
+      });
+      
+    }
     // Make the XHR to get the data, then update the card
+    app.hasRequestPending = true;
     var request = new XMLHttpRequest();
     request.onreadystatechange = function() {
       if (request.readyState === XMLHttpRequest.DONE) {
@@ -181,6 +210,7 @@
           var response = JSON.parse(request.response);
           response.key = key;
           response.label = label;
+          app.hasRequestPending = false;
           app.updateForecastCard(response);
         }
       }
