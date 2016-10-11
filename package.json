@@ -1,0 +1,36 @@
+{
+  "name": "weather-pwa",
+  "version": "0.0.1",
+  "description": "My first progressive web app",
+  "main": "service-worker.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/calvimor/weather-pwa.git"
+  },
+  "keywords": [
+    "progressive",
+    "web",
+    "app",
+    "pwa",
+    "js"
+  ],
+  "author": "Carlos Villamizar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/calvimor/weather-pwa/issues"
+  },
+  "homepage": "https://github.com/calvimor/weather-pwa#readme",
+  "devDependencies": {
+    "browser-sync": "^2.17.2",
+    "del": "^2.2.2",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-minify-css": "^1.2.4",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.3.2",
+    "sw-precache": "^4.1.0"
+  }
+}
