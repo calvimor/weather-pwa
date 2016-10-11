@@ -200,4 +200,20 @@
   app.saveSelectedCities = function() {
     window.localforage.setItem('selectedCities', app.selectedCities);
   };
+  
+  /*
+  * Service worker functionality
+  */
+  
+  // Register service worker
+  if( 'serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/service-worker.js')
+    .then(
+      function (registration) {
+        console.log("Service Worker Registered ", registration);
+      }
+    );  
+  }
+  
+  
 })();
